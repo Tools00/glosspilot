@@ -5,6 +5,30 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · SemVer.
 
 ## [Unreleased]
 
+### Added (v0.3.0 — Chunk A: Sites CRUD API)
+- `apps/api/src/routes/sites.ts`:
+  - `GET /sites` — paginated list (`page`, `pageSize`, optional `status` filter)
+  - `GET /sites/:id` — site with nested `tasks` and `materials`
+  - `POST /sites` (ADMIN) — atomic insert of site + nested tasks + materials in a transaction
+  - `PATCH /sites/:id` (ADMIN) — partial update with "at least one field" refinement
+  - `DELETE /sites/:id` (ADMIN) — soft-delete via `status='archived'`
+- Audit log entries on every write (`create`, `update`, `archive`) with payload
+- `@glosspilot/shared`: `SiteStatus`, `taskInputSchema`, `materialInputSchema`,
+  `createSiteSchema`, `updateSiteSchema`, `siteListQuerySchema`, `siteSchema`,
+  `siteWithChildrenSchema` — single source of truth for API and (forthcoming) web forms
+- Custom hex-color regex with friendly error message (`Must be a hex color like #2C5F2E`)
+
+### Verified (12 curl cases)
+- list + filter + pagination ✓
+- detail with tasks/materials ✓
+- WORKER POST → 403 ✓
+- ADMIN POST with 2 tasks + 1 material → atomic insert, all 3 rows returned by GET ✓
+- PATCH status=active ✓
+- PATCH empty body → 400 (zod refine) ✓
+- DELETE → status=archived, GET confirms ✓
+- POST with invalid color → 400 with descriptive message ✓
+- audit log shows 3 entries (create/update/archive) with payloads ✓
+
 ### Added (v0.2.0 — Chunk B: Frontend)
 - `apps/web/` Vite 6 + React 18 + TypeScript + Tailwind 4 (alpha vite plugin)
 - React Router 7 with `/login` and protected `/`
