@@ -1,28 +1,39 @@
-import "dotenv/config";
+import { config as loadEnv } from "dotenv";
+import { resolve } from "node:path";
 import { z } from "zod";
+
+// .env lives at the repo root. Scripts always run with cwd=apps/api via pnpm filter.
+loadEnv({ path: resolve(process.cwd(), "../../.env") });
 
 /**
  * Zod-validated environment. Fails fast with a clear error if anything is missing.
  * Per project-standards: no silent fails on config.
  */
+// dotenv reads missing values as empty string ""; treat those as undefined
+// so `.optional()` and defaults work naturally.
+const emptyToUndefined = <T extends z.ZodTypeAny>(s: T) =>
+  z.preprocess((v) => (v === "" ? undefined : v), s);
+
 const envSchema = z.object({
   DATABASE_URL: z.string().url().startsWith("postgres"),
-  AUTH_SECRET: z.string().min(32).optional(), // required from v0.2.0
-  AUTH_COOKIE_DOMAIN: z.string().optional(),
+  AUTH_SECRET: emptyToUndefined(z.string().min(32).optional()),
+  AUTH_COOKIE_DOMAIN: emptyToUndefined(z.string().optional()),
 
-  API_PORT: z.coerce.number().int().positive().default(3001),
-  API_ORIGIN: z.string().url().default("http://localhost:3001"),
-  WEB_ORIGIN: z.string().default("http://localhost:5173"),
+  API_PORT: emptyToUndefined(z.coerce.number().int().positive().default(3001)),
+  API_ORIGIN: emptyToUndefined(z.string().url().default("http://localhost:3001")),
+  WEB_ORIGIN: emptyToUndefined(z.string().default("http://localhost:5173")),
 
-  S3_ENDPOINT: z.string().url().optional(),
-  S3_BUCKET: z.string().optional(),
-  S3_ACCESS_KEY: z.string().optional(),
-  S3_SECRET_KEY: z.string().optional(),
+  S3_ENDPOINT: emptyToUndefined(z.string().url().optional()),
+  S3_BUCKET: emptyToUndefined(z.string().optional()),
+  S3_ACCESS_KEY: emptyToUndefined(z.string().optional()),
+  S3_SECRET_KEY: emptyToUndefined(z.string().optional()),
 
-  DEFAULT_LOCALE: z.string().default("en"),
-  DEFAULT_TIMEZONE: z.string().default("Europe/Berlin"),
+  DEFAULT_LOCALE: emptyToUndefined(z.string().default("en")),
+  DEFAULT_TIMEZONE: emptyToUndefined(z.string().default("Europe/Berlin")),
 
-  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+  NODE_ENV: emptyToUndefined(
+    z.enum(["development", "production", "test"]).default("development"),
+  ),
 });
 
 const parsed = envSchema.safeParse(process.env);

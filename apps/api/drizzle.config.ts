@@ -1,5 +1,9 @@
-import "dotenv/config";
+import { config as loadEnv } from "dotenv";
+import { resolve } from "node:path";
 import { defineConfig } from "drizzle-kit";
+
+// .env lives at the repo root. drizzle-kit always runs with cwd=apps/api.
+loadEnv({ path: resolve(process.cwd(), "../../.env") });
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
