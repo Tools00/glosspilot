@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "echo 'TODO v0.2.0: tsx watch src/server.ts'",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "echo 'TODO v0.2.0: node dist/server.js'",
+    "start": "node dist/server.js",
     "lint": "echo 'TODO: eslint'",
     "typecheck": "tsc --noEmit",
     "test": "echo 'TODO: vitest'",
@@ -17,10 +17,16 @@
     "db:seed": "tsx src/db/seed.ts"
   },
   "dependencies": {
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/cors": "^10.0.2",
+    "@glosspilot/shared": "workspace:*",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.5",
-    "drizzle-orm": "^0.36.4",
+    "drizzle-orm": "^0.38.3",
+    "fastify": "^5.2.0",
+    "fastify-type-provider-zod": "^4.0.2",
     "pg": "^8.13.1",
+    "pino-pretty": "^13.0.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

@@ -190,6 +190,26 @@ export const holidays = pgTable("holidays", {
   locale: varchar("locale", { length: 8 }).notNull().default("en"),
 });
 
+// ─── sessions ─────────────────────────────────────────────────────────────────
+
+export const sessions = pgTable(
+  "sessions",
+  {
+    id: varchar("id", { length: 64 }).primaryKey(), // opaque random token
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    userIdx: index("sessions_user_idx").on(t.userId),
+    expiresIdx: index("sessions_expires_idx").on(t.expiresAt),
+  }),
+);
+
 // ─── audit_log ────────────────────────────────────────────────────────────────
 
 export const auditLog = pgTable(
@@ -217,6 +237,11 @@ export const usersRelations = relations(users, ({ many }) => ({
   reports: many(reports),
   eventAssignments: many(eventWorkers),
   auditEntries: many(auditLog),
+  sessions: many(sessions),
+}));
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, { fields: [sessions.userId], references: [users.id] }),
 }));
 
 export const sitesRelations = relations(sites, ({ many, one }) => ({
@@ -261,3 +286,5 @@ export type Material = typeof materials.$inferSelect;
 export type Event = typeof events.$inferSelect;
 export type Report = typeof reports.$inferSelect;
 export type AuditEntry = typeof auditLog.$inferSelect;
+export type Session = typeof sessions.$inferSelect;
+export type NewSession = typeof sessions.$inferInsert;

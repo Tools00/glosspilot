@@ -5,6 +5,26 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · SemVer.
 
 ## [Unreleased]
 
+### Added (v0.2.0 — Chunk A: API + Auth)
+- Fastify 5 server with `@fastify/cookie`, `@fastify/cors`, `fastify-type-provider-zod`
+- Routes: `POST /auth/login`, `POST /auth/logout`, `GET /me`, `GET /health`
+- Hand-rolled session management (`apps/api/src/lib/sessions.ts`):
+  random 32-byte base64url tokens, 7-day TTL, opaque cookie `glosspilot_session`,
+  `httpOnly`+`sameSite=lax`, `secure` in production
+- Sessions table in DB (migration 0001), with FK cascade + indexes
+- RBAC: `requireAuth` and `requireRole(...roles)` preHandlers
+- Audit logging on login/logout via `apps/api/src/lib/audit.ts`
+- Constant-time-ish bcrypt compare even on email-miss (anti-timing-oracle)
+- `@glosspilot/shared` package with `loginSchema` + `userPublicSchema` (Zod, shared between API and future web)
+- Drizzle upgraded to `^0.38.3`
+- Pino-pretty for dev logs
+
+### Verified
+- 7/7 curl test cases: login, /me with cookie, /me without (401),
+  wrong password (401), invalid body (400 + zod details),
+  logout, /me after logout (401)
+- 2 audit entries written for one full session
+
 ## [0.1.1] — 2026-05-14
 
 ### Added
