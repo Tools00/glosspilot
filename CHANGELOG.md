@@ -5,6 +5,18 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · SemVer.
 
 ## [Unreleased]
 
+### Added (v0.2.0 — Chunk B: Frontend)
+- `apps/web/` Vite 6 + React 18 + TypeScript + Tailwind 4 (alpha vite plugin)
+- React Router 7 with `/login` and protected `/`
+- TanStack Query 5 wrapping the auth hooks (`useMe`, `useLogin`, `useLogout`)
+- `ProtectedRoute` honors role-based access
+- Login page with `react-hook-form` + `zod-resolver`, importing
+  `loginSchema` from `@glosspilot/shared` (single source of truth)
+- Home page renders different stub dashboards for ADMIN vs WORKER
+- Vite dev-proxy `/api/*` → `http://127.0.0.1:3001` so the browser never
+  hits cross-origin issues in dev
+- End-to-end verified: login → cookie set → /me on next reload → role-aware UI → logout → 401 again
+
 ### Added (v0.2.0 — Chunk A: API + Auth)
 - Fastify 5 server with `@fastify/cookie`, `@fastify/cors`, `fastify-type-provider-zod`
 - Routes: `POST /auth/login`, `POST /auth/logout`, `GET /me`, `GET /health`
