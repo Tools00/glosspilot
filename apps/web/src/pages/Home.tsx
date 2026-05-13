@@ -1,92 +1,62 @@
-import { useMe, useLogout } from "../api/auth";
+import { Link } from "react-router-dom";
+import { useMe } from "../api/auth";
+import { useSitesList } from "../api/sites";
 
 export function HomePage() {
   const { data: me } = useMe();
-  const logout = useLogout();
+  const active = useSitesList({ status: "active", pageSize: 100 });
+  const planned = useSitesList({ status: "planned", pageSize: 100 });
 
-  if (!me) return null; // ProtectedRoute should have redirected
-
+  if (!me) return null;
   const isAdmin = me.role === "ADMIN";
 
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 text-sm font-bold text-slate-900">
-              G
-            </div>
-            <span className="font-semibold tracking-tight">GlossPilot</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="text-right text-sm">
-              <div className="font-medium">{me.name}</div>
-              <div className="text-xs text-slate-400">
-                {me.email} ·{" "}
-                <span
-                  className={
-                    isAdmin ? "text-emerald-400" : "text-sky-400"
-                  }
-                >
-                  {me.role}
-                </span>
-              </div>
-            </div>
-            <div className="grid h-9 w-9 place-items-center rounded-full bg-slate-800 text-xs font-bold">
-              {me.initials}
-            </div>
-            <button
-              onClick={() => logout.mutate()}
-              className="rounded-lg border border-slate-700 px-3 py-1.5 text-sm hover:border-slate-500"
-            >
-              Sign out
-            </button>
-          </div>
-        </div>
-      </header>
+    <div>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold tracking-tight">
+          {isAdmin ? "Dispatcher dashboard" : "My day"}
+        </h1>
+        <p className="mt-1 text-sm text-slate-400">
+          v0.3.0 — Sites are live. Calendar (v0.4.0), reports (v0.5.0), photos (v0.6.0)
+          to follow.
+        </p>
+      </div>
 
-      <main className="mx-auto max-w-6xl px-6 py-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold tracking-tight">
-            {isAdmin ? "Dispatcher dashboard" : "My day"}
-          </h1>
-          <p className="mt-1 text-sm text-slate-400">
-            v0.2.0 — auth wired end-to-end. Real content arrives in v0.3.0 (sites)
-            and v0.4.0 (calendar).
-          </p>
-        </div>
-
-        {isAdmin ? <AdminStub /> : <WorkerStub />}
-      </main>
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card
+          title="Active sites"
+          v={String(active.data?.total ?? "—")}
+          link="/sites?status=active"
+        />
+        <Card
+          title="Planned sites"
+          v={String(planned.data?.total ?? "—")}
+          link="/sites?status=planned"
+        />
+        <Card title="Today's reports" v="—" hint="v0.5.0" />
+      </div>
     </div>
   );
 }
 
-function AdminStub() {
-  return (
-    <div className="grid gap-4 md:grid-cols-3">
-      <Card title="Active sites" v="—" hint="v0.3.0" />
-      <Card title="Today's reports" v="—" hint="v0.5.0" />
-      <Card title="Low-stock materials" v="—" hint="v0.5.0" />
-    </div>
-  );
-}
-
-function WorkerStub() {
-  return (
-    <div className="grid gap-4 md:grid-cols-2">
-      <Card title="Today's jobs" v="—" hint="v0.4.0" />
-      <Card title="Pending reports" v="—" hint="v0.5.0" />
-    </div>
-  );
-}
-
-function Card({ title, v, hint }: { title: string; v: string; hint: string }) {
-  return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+function Card({
+  title,
+  v,
+  hint,
+  link,
+}: {
+  title: string;
+  v: string;
+  hint?: string;
+  link?: string;
+}) {
+  const inner = (
+    <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5 transition hover:border-slate-700">
       <div className="text-xs uppercase tracking-wide text-slate-500">{title}</div>
       <div className="mt-2 text-3xl font-bold">{v}</div>
-      <div className="mt-1 text-xs text-slate-500">arrives in {hint}</div>
+      {hint && <div className="mt-1 text-xs text-slate-500">arrives in {hint}</div>}
+      {link && <div className="mt-1 text-xs text-emerald-500">View →</div>}
     </div>
   );
+  return link ? <Link to={link}>{inner}</Link> : inner;
 }

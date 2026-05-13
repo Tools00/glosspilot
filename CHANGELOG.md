@@ -5,6 +5,26 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · SemVer.
 
 ## [Unreleased]
 
+### Added (v0.3.0 — Chunk B: Sites Frontend)
+- `apps/web/src/api/sites.ts`: TanStack Query hooks for list/detail/create/update/archive
+- `apps/web/src/components/AppShell.tsx`: header + nav (Home / Sites) + user dropdown
+- `apps/web/src/components/StatusBadge.tsx`: role-styled status pills
+- Pages:
+  - `SitesList`: filter (All / Planned / Active / Completed / Archived), pagination,
+    color dot per site, progress percentage, click-through to detail
+  - `SiteDetail`: tasks + materials with progress bars, ADMIN-only status switch + archive
+  - `NewSiteModal`: react-hook-form + zodResolver against `createSiteSchema`,
+    `useFieldArray` for tasks + materials add/remove, atomic submit
+  - `Home`: live KPIs reading from `/sites?status=active` and `?status=planned`
+- Refactor: router uses `Outlet` + `AppShellRoute` wrapper so all protected pages share the shell
+
+### Verified
+- Sites list renders 5 seeded sites correctly
+- Filter switches counts (All=5, Active=3, Planned=1, Completed=1)
+- WORKER does NOT see "+ New site" or status/archive buttons
+- ADMIN can create a site with 2 tasks + 1 material via the modal
+- DB reseeded to clean state for the live demo
+
 ### Added (v0.3.0 — Chunk A: Sites CRUD API)
 - `apps/api/src/routes/sites.ts`:
   - `GET /sites` — paginated list (`page`, `pageSize`, optional `status` filter)
