@@ -5,6 +5,20 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · SemVer.
 
 ## [Unreleased]
 
+### Added (v0.5.0 — Chunk A: Reports API + Dashboard aggregates)
+- `POST /reports` (any auth user), `GET /reports` (paginated, filter by siteId/userId/from/to),
+  `GET /reports/:id` (user+site joined), `DELETE /reports/:id` (ADMIN, hard-delete + audit)
+- `GET /dashboard` (ADMIN): activeSitesCount, plannedSitesCount, todaysReportsCount,
+  todaysActiveEvents, lowStockMaterials (top 10 < 20% remaining), recentReports (last 10)
+- Shared zod schemas: `createReportSchema`, `reportSchema`, `reportWithJoinsSchema`,
+  `reportListQuerySchema`, `dashboardSchema`, `lowStockMaterialSchema`
+- Audit-log: `report.create`, `report.delete`
+
+### Changed
+- ADR 001: auth choice updated from `better-auth` to "hand-rolled sessions, swap-ready"
+  with full rationale (see ADR 001 § Auth revision).
+- `/health` version bumped to 0.5.0.
+
 ### Added (v0.4.0 — Chunk B: Calendar Frontend + Users picker)
 - New API route: `GET /users` (auth-required list for picker UIs, no password_hash)
 - `apps/web/src/api/{events,users}.ts`: TanStack Query hooks

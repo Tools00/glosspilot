@@ -221,3 +221,79 @@ export const eventRangeQuerySchema = z
     path: ["to"],
   });
 export type EventRangeQuery = z.infer<typeof eventRangeQuerySchema>;
+
+// ─── Reports ──────────────────────────────────────────────────────────────────
+
+export const createReportSchema = z.object({
+  siteId: z.number().int().positive(),
+  summary: z.string().min(1).max(2000),
+});
+export type CreateReportInput = z.infer<typeof createReportSchema>;
+
+export const reportSchema = z.object({
+  id: z.number().int().positive(),
+  siteId: z.number().int().positive(),
+  userId: z.number().int().positive(),
+  summary: z.string(),
+  reportedAt: z.string(),
+});
+export type Report = z.infer<typeof reportSchema>;
+
+export const reportWithJoinsSchema = reportSchema.extend({
+  user: z.object({
+    id: z.number().int().positive(),
+    name: z.string(),
+    initials: z.string(),
+    role: z.enum(["ADMIN", "WORKER"]),
+  }),
+  site: z.object({
+    id: z.number().int().positive(),
+    clientName: z.string(),
+    address: z.string(),
+    color: z.string(),
+    status: z.enum(["planned", "active", "completed", "archived"]),
+  }),
+});
+export type ReportWithJoins = z.infer<typeof reportWithJoinsSchema>;
+
+export const reportListQuerySchema = z
+  .object({
+    siteId: z.coerce.number().int().positive().optional(),
+    userId: z.coerce.number().int().positive().optional(),
+    from: dateStr.optional(),
+    to: dateStr.optional(),
+    page: z.coerce.number().int().min(1).default(1),
+    pageSize: z.coerce.number().int().min(1).max(100).default(20),
+  })
+  .refine((v) => !v.from || !v.to || v.from <= v.to, {
+    message: "to must be on or after from",
+    path: ["to"],
+  });
+export type ReportListQuery = z.infer<typeof reportListQuerySchema>;
+
+// ─── Dashboard aggregates ─────────────────────────────────────────────────────
+
+export const lowStockMaterialSchema = z.object({
+  id: z.number().int().positive(),
+  name: z.string(),
+  variant: z.string().nullable(),
+  neededQty: z.number(),
+  takenQty: z.number(),
+  remainingPct: z.number(),
+  site: z.object({
+    id: z.number().int().positive(),
+    clientName: z.string(),
+    color: z.string(),
+  }),
+});
+export type LowStockMaterial = z.infer<typeof lowStockMaterialSchema>;
+
+export const dashboardSchema = z.object({
+  activeSitesCount: z.number().int(),
+  plannedSitesCount: z.number().int(),
+  todaysReportsCount: z.number().int(),
+  todaysActiveEvents: z.number().int(),
+  lowStockMaterials: z.array(lowStockMaterialSchema),
+  recentReports: z.array(reportWithJoinsSchema),
+});
+export type Dashboard = z.infer<typeof dashboardSchema>;
