@@ -5,6 +5,32 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · SemVer.
 
 ## [Unreleased]
 
+### Added (v0.4.0 — Chunk B: Calendar Frontend + Users picker)
+- New API route: `GET /users` (auth-required list for picker UIs, no password_hash)
+- `apps/web/src/api/{events,users}.ts`: TanStack Query hooks
+- `apps/web/src/lib/calendar.ts`: ISO-string date helpers, monthGrid, monthLabel
+- Pages:
+  - `Calendar`: month grid (Mon-first), color-coded event bars, today highlight,
+    prev/next/today nav, "Mine only" filter for workers, ADMIN-click-day to create
+  - `NewEventModal`: site picker (excludes archived), worker multi-select chips
+    via Controller, date range with zod refine
+  - `EventDetailModal`: site link, worker chips, ADMIN-only delete with confirm
+- Home: shows "My jobs today" KPI + today's-schedule list (from `/me/today`)
+- Nav: added Calendar link
+- Vite: nothing to change — proxy still routes all `/api/*` to API
+
+### Added (v0.4.0 — Chunk A: Events/Calendar API)
+- 5 routes in `apps/api/src/routes/events.ts`: range list, detail, create, patch, delete
+- `GET /me/today` worker endpoint
+- `GET /users` minimal list endpoint
+- Range overlap predicate; bulk-fetches workers in a single query
+- POST inherits site color when none given; validates site existence
+- PATCH replaces workerIds atomically via DELETE+INSERT in a transaction
+- DELETE relies on `event_workers.eventId` CASCADE
+- Shared schemas: `createEventSchema` (with start≤end refine), `updateEventSchema`,
+  `eventRangeQuerySchema` (with from≤to refine), `eventSchema`, `eventWithWorkersSchema`
+- 10/10 curl tests pass
+
 ### Added (v0.3.0 — Chunk B: Sites Frontend)
 - `apps/web/src/api/sites.ts`: TanStack Query hooks for list/detail/create/update/archive
 - `apps/web/src/components/AppShell.tsx`: header + nav (Home / Sites) + user dropdown

@@ -4,6 +4,7 @@ import { LoginPage } from "./pages/Login";
 import { HomePage } from "./pages/Home";
 import { SitesListPage } from "./pages/SitesList";
 import { SiteDetailPage } from "./pages/SiteDetail";
+import { CalendarPage } from "./pages/Calendar";
 import { ProtectedRoute } from "./auth/ProtectedRoute";
 import { AppShellRoute } from "./auth/AppShellRoute";
 
@@ -29,6 +30,7 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/sites" element={<SitesListPage />} />
             <Route path="/sites/:id" element={<SiteDetailPage />} />
+            <Route path="/calendar" element={<CalendarPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

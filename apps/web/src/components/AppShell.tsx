@@ -6,6 +6,7 @@ import { useLogout } from "../api/auth";
 const nav = [
   { to: "/", label: "Home" },
   { to: "/sites", label: "Sites" },
+  { to: "/calendar", label: "Calendar" },
 ];
 
 export function AppShell({
