@@ -7,6 +7,7 @@ const nav = [
   { to: "/", label: "Home" },
   { to: "/sites", label: "Sites" },
   { to: "/calendar", label: "Calendar" },
+  { to: "/reports", label: "Reports" },
 ];
 
 export function AppShell({

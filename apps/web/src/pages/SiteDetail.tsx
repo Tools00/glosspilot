@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import type { SiteStatus } from "@glosspilot/shared";
 import { useMe } from "../api/auth";
 import { useArchiveSite, useSite, useUpdateSite } from "../api/sites";
+import { useReportsList, useDeleteReport } from "../api/reports";
 import { StatusBadge } from "../components/StatusBadge";
+import { NewReportModal } from "./NewReportModal";
 
 export function SiteDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -13,6 +16,11 @@ export function SiteDetailPage() {
   const archive = useArchiveSite();
   const navigate = useNavigate();
   const isAdmin = me?.role === "ADMIN";
+  const [showNewReport, setShowNewReport] = useState(false);
+  const reports = useReportsList(
+    siteId ? { siteId, pageSize: 20 } : {},
+  );
+  const delReport = useDeleteReport();
 
   if (isLoading) {
     return <div className="text-slate-400">Loading…</div>;
@@ -169,6 +177,60 @@ export function SiteDetailPage() {
           </div>
         </section>
       </div>
+
+      <section className="mt-10">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+            Reports ({reports.data?.total ?? 0})
+          </h2>
+          <button
+            onClick={() => setShowNewReport(true)}
+            className="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-slate-950 hover:bg-emerald-400"
+          >
+            + New report
+          </button>
+        </div>
+        <div className="space-y-2">
+          {reports.data?.items.length === 0 && (
+            <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-4 text-sm text-slate-500">
+              No reports yet for this site.
+            </div>
+          )}
+          {reports.data?.items.map((r) => (
+            <article
+              key={r.id}
+              className="rounded-lg border border-slate-800 bg-slate-900/50 p-3"
+            >
+              <div className="flex items-center justify-between text-xs text-slate-400">
+                <span>
+                  {r.user.name} ({r.user.initials}) ·{" "}
+                  {new Date(r.reportedAt).toLocaleString()}
+                </span>
+                {isAdmin && (
+                  <button
+                    onClick={() => {
+                      if (confirm("Delete this report?")) delReport.mutate(r.id);
+                    }}
+                    className="text-rose-400 hover:text-rose-300"
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
+              <p className="mt-2 whitespace-pre-wrap text-sm text-slate-200">
+                {r.summary}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {showNewReport && siteId !== null && (
+        <NewReportModal
+          defaultSiteId={siteId}
+          onClose={() => setShowNewReport(false)}
+        />
+      )}
     </div>
   );
 }

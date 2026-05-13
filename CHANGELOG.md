@@ -5,6 +5,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · SemVer.
 
 ## [Unreleased]
 
+### Added (v0.5.0 — Chunk B: Reports frontend + Dashboard wiring)
+- `/reports` page: paginated list with filters (site, worker, from, to), inline
+  "+ New report" modal, ADMIN-only delete per row
+- `NewReportModal`: reusable modal (standalone or from SiteDetail with prefilled site)
+- `SiteDetailPage`: Reports section under Tasks/Materials, "+ New report" inline,
+  ADMIN inline delete
+- `HomePage` (ADMIN): 4 real aggregate cards (active/planned/today's reports/today's
+  events) + Low-stock-materials list + Recent reports feed
+- AppShell nav: Reports entry; new `/reports` route
+
 ### Added (v0.5.0 — Chunk A: Reports API + Dashboard aggregates)
 - `POST /reports` (any auth user), `GET /reports` (paginated, filter by siteId/userId/from/to),
   `GET /reports/:id` (user+site joined), `DELETE /reports/:id` (ADMIN, hard-delete + audit)
