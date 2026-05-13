@@ -1,0 +1,14 @@
+{
+  "name": "@glosspilot/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "echo 'TODO v0.2.0: vite'",
+    "build": "echo 'TODO v0.2.0: vite build'",
+    "preview": "echo 'TODO v0.2.0: vite preview'",
+    "lint": "echo 'TODO: eslint'",
+    "typecheck": "echo 'TODO: tsc --noEmit'",
+    "test": "echo 'TODO: vitest'"
+  }
+}

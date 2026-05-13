@@ -1,0 +1,16 @@
+{
+  "name": "@glosspilot/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "echo 'TODO v0.2.0: tsx watch src/server.ts'",
+    "build": "echo 'TODO v0.2.0: tsc'",
+    "start": "echo 'TODO v0.2.0: node dist/server.js'",
+    "lint": "echo 'TODO: eslint'",
+    "typecheck": "echo 'TODO: tsc --noEmit'",
+    "test": "echo 'TODO: vitest'",
+    "db:migrate": "echo 'TODO v0.2.0: drizzle-kit migrate'",
+    "db:seed": "echo 'TODO v0.2.0: tsx src/db/seed.ts'"
+  }
+}

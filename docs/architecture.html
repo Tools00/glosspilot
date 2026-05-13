@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>GlossPilot — Architecture Diagrams</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; line-height: 1.5; }
+  h1 { margin-bottom: 0; }
+  .sub { color: #888; margin-top: 0.25rem; }
+  h2 { margin-top: 2.5rem; border-bottom: 1px solid #8884; padding-bottom: 0.3rem; }
+  .diagram { background: #fff; border: 1px solid #8884; border-radius: 8px;
+             padding: 1rem; overflow-x: auto; }
+  @media (prefers-color-scheme: dark) { .diagram { background: #1a1a1a; } }
+  p.note { color: #888; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<h1>GlossPilot — Architecture</h1>
+<p class="sub">Local diagram preview. Edit the <code>&lt;pre&gt;</code> blocks below or update README.md and copy here.</p>
+
+<h2>1. System architecture</h2>
+<div class="diagram">
+<pre class="mermaid">
+flowchart LR
+  subgraph Browser
+    SPA[React + Vite SPA<br/>TanStack Query<br/>Tailwind UI]
+  end
+
+  subgraph Server[Node 22 / Fastify]
+    API[REST API<br/>Zod validation]
+    Auth[better-auth<br/>session cookies]
+    RBAC[RBAC middleware<br/>ADMIN / WORKER]
+  end
+
+  subgraph Data
+    PG[(Postgres 16)]
+    Drizzle[Drizzle ORM<br/>+ migrations]
+  end
+
+  Files[/Object photos<br/>S3-compatible/]
+
+  SPA -- fetch + cookies --> API
+  API --> Auth
+  API --> RBAC
+  RBAC --> Drizzle
+  Drizzle --> PG
+  API --> Files
+</pre>
+</div>
+
+<h2>2. Domain model (ER)</h2>
+<div class="diagram">
+<pre class="mermaid">
+erDiagram
+  USERS ||--o{ SITES : "created_by"
+  USERS ||--o{ REPORTS : "filed"
+  USERS ||--o{ AUDIT_LOG : "did"
+  SITES ||--o{ TASKS : "has"
+  SITES ||--o{ MATERIALS : "consumes"
+  SITES ||--o{ EVENTS : "scheduled_as"
+  SITES ||--o{ REPORTS : "covers"
+  EVENTS }o--o{ USERS : "assigned via event_workers"
+
+  USERS { int id PK string email UK string role }
+  SITES { int id PK string client_name string status int total_units int done_units }
+  TASKS { int id PK int site_id FK string name int total int done }
+  MATERIALS { int id PK int site_id FK string name float needed_qty float taken_qty }
+  EVENTS { int id PK int site_id FK date start_date date end_date }
+  REPORTS { int id PK int site_id FK int user_id FK text summary }
+  AUDIT_LOG { int id PK int user_id FK string action string entity jsonb payload }
+</pre>
+</div>
+
+<h2>3. Admin vs Worker flow</h2>
+<div class="diagram">
+<pre class="mermaid">
+sequenceDiagram
+  participant Admin
+  participant API
+  participant DB
+  participant Worker
+
+  Admin->>API: POST /sites (new job)
+  API->>DB: insert site + tasks + materials
+  API-->>Admin: 201 Created
+
+  Admin->>API: POST /events (assign workers)
+  API->>DB: insert event + event_workers
+  API-->>Admin: 201 Created
+
+  Note over Worker: morning login
+  Worker->>API: GET /me/today
+  API->>DB: events where worker_id = me AND date = today
+  API-->>Worker: list of jobs
+
+  Worker->>API: POST /reports {site_id, summary}
+  API->>DB: insert report + audit_log
+  API-->>Worker: 201 Created
+
+  Admin->>API: GET /dashboard
+  API->>DB: aggregate active sites, today's reports, material burn
+  API-->>Admin: dashboard payload
+</pre>
+</div>
+
+<p class="note">Rendered with mermaid.js via CDN. Open this file directly in a browser — no server needed.</p>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true, theme: "default" });
+</script>
+</body>
+</html>

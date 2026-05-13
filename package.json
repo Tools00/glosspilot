@@ -1,0 +1,24 @@
+{
+  "name": "glosspilot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Field-ops dashboard template — admin dispatch + worker app. Open source, MIT.",
+  "license": "MIT",
+  "author": "Abed Qadi",
+  "type": "module",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=9"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel run dev",
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint",
+    "typecheck": "pnpm -r run typecheck",
+    "test": "pnpm -r run test",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "db:migrate": "pnpm --filter @glosspilot/api run db:migrate",
+    "db:seed": "pnpm --filter @glosspilot/api run db:seed"
+  }
+}

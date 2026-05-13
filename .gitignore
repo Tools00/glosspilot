@@ -1,0 +1,37 @@
+# env
+.env
+.env.local
+.env.*.local
+
+# deps
+node_modules
+.pnpm-store
+
+# build
+dist
+build
+.next
+.turbo
+.vite
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# editor
+.vscode
+.idea
+*.swp
+.DS_Store
+
+# test
+coverage
+.nyc_output
+
+# db
+*.sqlite
+*.sqlite-journal
+
+# generated
+docs/architecture.svg
