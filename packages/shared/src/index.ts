@@ -146,3 +146,78 @@ export const siteWithChildrenSchema = siteSchema.extend({
   materials: z.array(materialSchema),
 });
 export type SiteWithChildren = z.infer<typeof siteWithChildrenSchema>;
+
+// ─── Events (calendar) ────────────────────────────────────────────────────────
+
+export const eventSchema = z.object({
+  id: z.number().int().positive(),
+  siteId: z.number().int().positive(),
+  title: z.string(),
+  note: z.string().nullable(),
+  startDate: z.string(),
+  endDate: z.string(),
+  color: z.string(),
+  createdAt: z.string(),
+});
+export type Event = z.infer<typeof eventSchema>;
+
+export const eventWithWorkersSchema = eventSchema.extend({
+  workers: z.array(
+    z.object({
+      id: z.number().int().positive(),
+      name: z.string(),
+      initials: z.string(),
+      role: z.enum(["ADMIN", "WORKER"]),
+    }),
+  ),
+  site: z.object({
+    id: z.number().int().positive(),
+    clientName: z.string(),
+    address: z.string(),
+    color: z.string(),
+    status: z.enum(["planned", "active", "completed", "archived"]),
+  }),
+});
+export type EventWithWorkers = z.infer<typeof eventWithWorkersSchema>;
+
+export const createEventSchema = z
+  .object({
+    siteId: z.number().int().positive(),
+    title: z.string().min(1).max(200),
+    note: z.string().max(2000).optional().nullable(),
+    startDate: dateStr,
+    endDate: dateStr,
+    color: hexColor.optional(),
+    workerIds: z.array(z.number().int().positive()).default([]),
+  })
+  .refine((v) => v.startDate <= v.endDate, {
+    message: "endDate must be on or after startDate",
+    path: ["endDate"],
+  });
+export type CreateEventInput = z.infer<typeof createEventSchema>;
+
+export const updateEventSchema = z
+  .object({
+    title: z.string().min(1).max(200).optional(),
+    note: z.string().max(2000).nullable().optional(),
+    startDate: dateStr.optional(),
+    endDate: dateStr.optional(),
+    color: hexColor.optional(),
+    workerIds: z.array(z.number().int().positive()).optional(),
+  })
+  .refine((v) => Object.keys(v).length > 0, {
+    message: "At least one field must be provided",
+  });
+export type UpdateEventInput = z.infer<typeof updateEventSchema>;
+
+export const eventRangeQuerySchema = z
+  .object({
+    from: dateStr,
+    to: dateStr,
+    userId: z.coerce.number().int().positive().optional(),
+  })
+  .refine((v) => v.from <= v.to, {
+    message: "to must be on or after from",
+    path: ["to"],
+  });
+export type EventRangeQuery = z.infer<typeof eventRangeQuerySchema>;

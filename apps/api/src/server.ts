@@ -10,6 +10,7 @@ import { env } from "./env.js";
 import { authRoutes } from "./routes/auth.js";
 import { meRoutes } from "./routes/me.js";
 import { siteRoutes } from "./routes/sites.js";
+import { eventRoutes } from "./routes/events.js";
 
 async function build() {
   const app = Fastify({
@@ -36,6 +37,7 @@ async function build() {
   await app.register(authRoutes);
   await app.register(meRoutes);
   await app.register(siteRoutes);
+  await app.register(eventRoutes);
 
   app.setErrorHandler((err: unknown, _req, reply) => {
     const e = err as { validation?: unknown; statusCode?: number; name?: string; message?: string };
